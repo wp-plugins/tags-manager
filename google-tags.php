@@ -136,21 +136,6 @@ function google_remarketing_footer() {
 
 }
 
-/**
-add_filter('the_content','google_remarketing_body');
-
-function google_remarketing_body($content) {
- 	
- 	$remarketing = stripslashes(get_option('google-remarketing'));
- 	return $content.$remarketing;  
-	
-	
-}
-**/
-
-//エラー処理
-
-
 
 
 

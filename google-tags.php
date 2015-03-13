@@ -23,9 +23,7 @@ function google_tags_admin_menu() {
 		__('Tags Manager', 'my_google_tags'), 
 		'manage_options', 
 		'google_tags', 
-		'my_google_tags'
-	
-	
+		'my_google_tags'		
 	); 
 }
 
@@ -36,22 +34,22 @@ function my_google_tags() {
 
 <div class="wrap">
 <h2>Tags Manager by Googles</h2>
-<h3>Google WebMasterToolのタグ, Google Analyticsのトラッキングレコード, Googleリマーケティングのタグ設定</h3>
+<h3>Set Up of Google WebMasterTool, Google Analytics and Google Remarketing </h3>
 <form id="google-tags" method="post" action="">
 	
 	<?php wp_nonce_field( 'google-tabs-nonce-key', 'google-tags' );  ?>
 	
-	<p><?php echo esc_html(__( 'Googleウェブマスターツールのタグ', 'google-tags' )); ?>:
+	<p><?php echo esc_html(__( 'Google Webmastertool is here', 'google-tags' )); ?>:
 	<input type="text" name="google-webmaster-tool" value="<?php echo esc_attr(stripslashes(get_option('google-webmaster-tool'))); ?>" size="105"/></p>
 
-	<p><?php echo esc_html(__( 'Googleアナリティクスのタグ', 'google-tags' )); ?>:</p>
+	<p><?php echo esc_html(__( 'Google Analytics is here', 'google-tags' )); ?>:</p>
 	<textarea cols="40" rows="6" name="google-analytics"><?php echo esc_textarea(stripslashes(get_option('google-analytics'))); ?></textarea>
 	
-	<p><?php echo esc_html(__( 'Googleリマーケティングのタグ', 'google-tags' )); ?>:</p>
+	<p><?php echo esc_html(__( 'Google Remarketing is here', 'google-tags' )); ?>:</p>
 	<textarea cols="40" rows="6" name="google-remarketing"><?php echo esc_textarea(stripslashes(get_option('google-remarketing'))); ?></textarea>
 	
 	
-	<p><input type="submit" value="<?php echo esc_attr(__( '保存する！', 'google_tags' ));?>" class="button button-primary button-large"></p>
+	<p><input type="submit" value="<?php echo esc_attr(__( 'Submit', 'google_tags' ));?>" class="button button-primary button-large"></p>
 	
 </form>
 </div>
@@ -62,20 +60,30 @@ function my_google_tags() {
 add_action( 'admin_init', 'google_tags_admin_init' );
 
 function google_tags_admin_init() {
+
+	$e = new WP_Error(); 
 	
 	if(isset($_POST['google-tags']) && $_POST['google-tags']) {
-		if (check_admin_referer( 'google-tabs-nonce-key', 'google-tags' ) ){
+				if (check_admin_referer( 'google-tabs-nonce-key', 'google-tags' ) ){
 			
 			if( isset($_POST['google-webmaster-tool']) && $_POST['google-webmaster-tool']) {
-				update_option( 'google-webmaster-tool', trim( $_POST['google-webmaster-tool'] ) ); 
+				update_option( 'google-webmaster-tool', trim( $_POST['google-webmaster-tool'] ) ); 	
+				//アラート
+				$e->add( 'update', 'Post the Webmaster tag.', 'my_google_tags' );
+				set_transient( 'my_google_tags_notice', $e->get_error_messages(), 5 ); 
+		
 	
 			} else {
 				
-				update_option( 'google-webmaster-tool', '' ); 	
+				update_option( 'google-webmaster-tool', ''); 	
+				
 			}
 			
 			if( isset($_POST['google-analytics']) && $_POST['google-analytics']) {
 				update_option( 'google-analytics', trim( $_POST['google-analytics'] ) ); 
+				//アラート
+				$e->add( 'update', 'Post the Analytics tag.', 'my_google_tags' );
+				set_transient( 'my_google_tags_notice', $e->get_error_messages(), 5 ); 
 	
 			} else {
 				
@@ -84,6 +92,9 @@ function google_tags_admin_init() {
 			
 			if( isset($_POST['google-remarketing']) && $_POST['google-remarketing']) {
 				update_option( 'google-remarketing', trim( $_POST['google-remarketing'] ) ); 
+				//アラート
+				$e->add( 'update', 'Post the Remarketing tag.', 'my_google_tags' );
+				set_transient( 'my_google_tags_notice', $e->get_error_messages(), 5 ); 
 	
 			} else {
 				
@@ -93,9 +104,12 @@ function google_tags_admin_init() {
 			
 			wp_safe_redirect( menu_page_url( 'google-tags', false )); 
 			
+			
+			
 			}
-	}
 	
+	}
+		
 }
 
 
@@ -109,6 +123,7 @@ function google_webmaster_tool_head() {
 		echo $webmaster1."\n"; 
 		echo $webmaster. "\n"; 
 	}
+
 
 }
 
@@ -135,6 +150,29 @@ function google_remarketing_footer() {
 	}
 
 }
+
+
+//エラー処理
+add_action('admin_notices', 'google_tags_notices');
+
+function google_tags_notices() {
+
+?>
+	<?php if ( $messages = get_transient( 'my_google_tags_notice' ) ): ?>
+	<div class="updated">
+		<ul>
+			<?php foreach( $messages as $message ): ?>
+				<li><?php echo esc_html( $message ); ?></li>
+			<?php endforeach; ?>
+
+		
+		</ul>
+	</div>
+	<?php endif; ?>
+	
+<?php	
+}
+
 
 
 

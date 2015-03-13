@@ -27,9 +27,9 @@ This plugin can manage tags, such as Google Webmaster, Google Analytics and Goog
 
 
 == Changelog ==
-= 1.0=
+= 1.0 =
 * Show the post message and changing langauage from Japanese to English. 
-= 0.3=
+= 0.3 =
 * change details.
 = 0.2 =
 * Initial changes. 
